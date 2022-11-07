@@ -1,4 +1,4 @@
-import PageObjects.MainPage;
+import pageobjects.MainPage;
 import org.junit.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -26,8 +26,6 @@ public class MainPageTest {
         Assert.assertEquals("https://qa-scooter.praktikum-services.ru/", driver.getCurrentUrl());
     }
 
-
-
     @Test
     public void yandexLogoClick() throws Exception {
         if (driver.getWindowHandles().size() > 1) {
@@ -35,13 +33,7 @@ public class MainPageTest {
         }
         page.clickYandexLogo();
         new WebDriverWait(driver, Duration.ofSeconds(5)).wait();
-        if (driver.getWindowHandles().size() == 2) {
-            driver.close();
-            Assert.assertTrue(true);
-        }
-        else {
-            Assert.fail();
-        }
+        Assert.assertEquals(2, driver.getWindowHandles().size());
     }
 
     @AfterClass
