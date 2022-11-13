@@ -1,9 +1,7 @@
 package pageobjects;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import constants.Constants;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -13,7 +11,7 @@ import java.time.Duration;
 import java.util.regex.Pattern;
 
 public class OrderPage {
-    private final String page_url = "https://qa-scooter.praktikum-services.ru/order";
+    private final String pageURL = Constants.ORDER_PAGE_URL;
 
     // Конструктор
     private final WebDriver driver;
@@ -22,12 +20,6 @@ public class OrderPage {
         this.driver = driver;
     }
 
-    // Лого "Яндекс"
-    @FindBy(xpath = "//*[@id=\"root\"]/div/div/div[1]/div[1]/a[1]")
-    private WebElement yandexLogo;
-    // Лого "Самокат"
-    @FindBy(xpath = "//*[@id=\"root\"]/div/div/div[1]/div[1]/a[2]")
-    private WebElement scooterLogo;
     // Название шага
     @FindBy(css = "div[class*='Order_Header']")
     private WebElement stepTitle;
@@ -61,7 +53,7 @@ public class OrderPage {
     @FindBy(css = "div.Dropdown-menu")
     private WebElement rentLengthList;
     // Выбор цвета
-    @FindBy(xpath = "//*[@id=\"root\"]/div/div[2]/div[2]/div[3]")
+    @FindBy(css = "div[class*='Order_Checkboxes']")
     private WebElement colorCheckboxes;
     // Поле комментария курьеру
     @FindBy(css = "input[placeholder*='Комментарий для курьера']")
@@ -79,15 +71,18 @@ public class OrderPage {
     // Кнопка подтверждения заказа
     @FindBy(xpath = "//div[contains(@class, 'Order_Modal')]/div[contains(@class, 'Order_Buttons')]/button[contains(text(), 'Да')]")
     private WebElement confirmButton;
+    // Заголовок окна
+    @FindBy(css = "div[class*='Order_ModalHeader']")
+    private WebElement modalHeader;
     // Текст окна
-    @FindBy(xpath = "//*[@id=\"root\"]/div/div[2]/div[5]/div[1]/div")
-    private WebElement orderText;
+    @FindBy(css = "div[class*='Order_Text']")
+    private WebElement modalText;
 
     public String getURL() {
-        return page_url;
+        return pageURL;
     }
     public void open() {
-        driver.get(page_url);
+        driver.get(pageURL);
     }
     public String getStepTitle() {
         return stepTitle.getText();
@@ -102,8 +97,10 @@ public class OrderPage {
     public void enterAddress(String address) {
         addressField.sendKeys(address);
     }
-    public String selectMetroStation(String station) {
-        metroStationSelect.sendKeys(station, Keys.ARROW_DOWN, Keys.ENTER);
+    public String selectMetroStation(String station) throws InterruptedException {
+        metroStationSelect.sendKeys(station);
+        Thread.sleep(500);
+        metroStationSelect.sendKeys(Keys.ARROW_DOWN, Keys.ENTER);
         return metroStationSelect.getAttribute("value");
     }
     public void enterPhoneNumber(String phoneNumber) {
@@ -117,17 +114,17 @@ public class OrderPage {
      * Формат: dd.MM.yy
      */
     public void chooseRentDay(String day) {
-        rentDate.sendKeys(day);
+        rentDate.sendKeys(day, Keys.ENTER);
     }
     public String chooseRentLength(int length) {
         rentLength.click();
-        WebElement option = rentLengthList.findElements(By.xpath("./child::*")).get(length-1);
+        WebElement option = rentLengthList.findElement(By.xpath("./div[" + length + "]"));
         String optionText = option.getText();
         option.click();
         return optionText;
     }
-    public String chooseColor(int index) {
-        WebElement chosenColor = colorCheckboxes.findElements(By.xpath("./child::*")).get(index);
+    public String chooseColor(int colorNumber) {
+        WebElement chosenColor = colorCheckboxes.findElement(By.xpath("./label[" + colorNumber + "]"));
         String chosenColorText = chosenColor.getText();
         chosenColor.click();
         return chosenColorText;
@@ -144,11 +141,18 @@ public class OrderPage {
     public void clickConfirmButton() {
         confirmButton.click();
     }
+    public String getModalHeader() {
+        return modalHeader.getText();
+    }
+    public String getModalText() {
+        return modalText.getText();
+    }
     public String getOrderNumber() {
-        return orderText.getText().replaceAll("\\D", "");
+        new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.textMatches(By.xpath("//div[contains(@class, 'Order_Text')]"), Pattern.compile("\\d+")));
+        return modalText.getText().replaceAll("\\D", "");
     }
 
-    public boolean firstStep(String firstName, String lastName, String address, String metroStationName, String phoneNumber) {
+    public boolean firstStep(String firstName, String lastName, String address, String metroStationName, String phoneNumber) throws InterruptedException {
         enterFirstName(firstName);
         enterLastName(lastName);
         enterAddress(address);
@@ -164,8 +168,6 @@ public class OrderPage {
         enterComment(comment);
         clickOrderButton();
         clickConfirmButton();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        wait.until(ExpectedConditions.textMatches(By.xpath("//*[@id=\"root\"]/div/div[2]/div[5]/div[1]/div"), Pattern.compile("\\d+")));
         return getOrderNumber();
     }
     public String secondStep(String day, int length, int colorIndex) {
@@ -174,9 +176,6 @@ public class OrderPage {
         chooseColor(colorIndex);
         clickOrderButton();
         clickConfirmButton();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        wait.until(ExpectedConditions.textMatches(By.xpath("//*[@id=\"root\"]/div/div[2]/div[5]/div[1]/div"), Pattern.compile("\\d+")));
         return getOrderNumber();
     }
 }
-// TODO: change locators to CSS, change color element(checkboxes have ids)
