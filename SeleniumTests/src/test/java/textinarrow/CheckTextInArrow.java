@@ -1,4 +1,4 @@
-package textInArrow;
+package textinarrow;
 
 import org.hamcrest.MatcherAssert;
 import org.junit.runner.RunWith;
@@ -17,13 +17,13 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class checkTextInArrow {
+public class CheckTextInArrow {
     private WebDriver driver;
     private final String faqAccordionItemId;
     private final boolean faqAccordionItemPanelHiddenExpected; // true - элемент скрыт, false - элемент видим
     private final String faqAccordionItemPanelTextExpected;
 
-    public checkTextInArrow(String accordionItemId, boolean faqAccordionItemPanelHiddenExpected, String faqAccordionItemPanelText) {
+    public CheckTextInArrow(String accordionItemId, boolean faqAccordionItemPanelHiddenExpected, String faqAccordionItemPanelText) {
         this.faqAccordionItemId = accordionItemId;
         this.faqAccordionItemPanelHiddenExpected = faqAccordionItemPanelHiddenExpected;
         this.faqAccordionItemPanelTextExpected = faqAccordionItemPanelText;

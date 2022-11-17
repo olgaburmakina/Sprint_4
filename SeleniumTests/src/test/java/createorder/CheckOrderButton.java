@@ -1,4 +1,4 @@
-package createOrder;
+package createorder;
 
 import pom.OrderPage;
 import org.junit.After;
@@ -12,7 +12,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import java.time.Duration;
 @RunWith(Parameterized.class)
 
-public class checkOrderButton {
+public class CheckOrderButton {
 
     private WebDriver driver;
 
@@ -26,7 +26,7 @@ public class checkOrderButton {
     private final String period;
 
 
-    public checkOrderButton(int numberOfButton, String name, String lastName, String metro, String address, String phone, String date, String period){
+    public CheckOrderButton(int numberOfButton, String name, String lastName, String metro, String address, String phone, String date, String period){
         this.numberOfButton = numberOfButton;
         this.name = name;
         this.lastName = lastName;
